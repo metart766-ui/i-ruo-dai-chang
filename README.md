@@ -1,83 +1,101 @@
-# 王东岳"递弱代偿"理论计算模拟与可视化平台
-# (Di-Ruo Dai-Chang Theory Computational Simulation Platform)
+# 递弱代偿：文明演化的数学验证 (Di-Ruo Dai-Chang Simulation)
 
-本项目旨在通过计算机模拟（元胞自动机）、数学建模（系统可靠性工程）和数据可视化，对王东岳先生的"递弱代偿"哲学理论进行定量验证与探索。
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![React](https://img.shields.io/badge/react-18.0+-61dafb.svg)](https://reactjs.org/)
 
-## 🧬 项目核心
+> "万物存在度的递减，是宇宙演化的根本方向；而代偿度的增加，只是为了对抗这种递减的权宜之计。" —— 王东岳
 
-我们构建了一个基于**元胞自动机 (Cellular Automata)** 的演化系统，模拟个体在资源约束和熵增压力下的演化路径。
+本项目通过**元胞自动机 (Cellular Automata)** 和 **系统可靠性工程**，将王东岳先生的哲学理论转化为可计算、可验证的数学模型。
 
-核心验证目标：
-1.  **存在度 (P)** 与 **代偿度 (C)** 的负相关关系。
-2.  **P × C** 的守恒性趋势。
-3.  系统在临界点的**相变 (Phase Transition)** 行为。
+---
 
-## 📂 项目结构
+## 📸 实验看板 (Dashboard)
 
-```
-.
-├── siyan_experiment.py           # [核心] 元胞自动机演化模拟器
-├── singularity_evolution.py      # [扩展] "奇点计划"演化模拟器 (引入技术重构机制)
-├── mars_mode_stress_test.py      # [测试] "火星模式"极端环境压力测试
-├── comprehensive_report_generator.py # [工具] 综合实验报告生成器
-├── server.py                     # [后端] FastAPI 数据服务，用于前端交互
-├── wandongyu-viz/                # [前端] 基于 React + Ant Design 的现代化可视化看板
-├── comprehensive_report/         # [产出] 自动生成的实验数据与图表报告
-└── ...
-```
+我们构建了一个现代化的交互式实验室，支持实时参数调整与演化观测。
+
+### 1. 核心指标监控
+![Dashboard Overview](wandongyu-viz/public/images/basic_experiment_time_series.png)
+*实时追踪存活率、代偿度(C)与存在度(P)的动态关系*
+
+### 2. 相变与临界点分析
+![Phase Diagram](wandongyu-viz/public/images/phase_diagram.png)
+*系统在不同维护成本($\gamma$)与环境敏感性($\beta$)下的生存相图*
+
+---
+
+## 🧬 核心发现
+
+通过数千次模拟演化，我们的模型揭示了以下规律：
+
+1.  **递弱代偿铁律 (The Iron Law)**
+    *   在自然演化条件下，随着代偿度（复杂度 $C$）的上升，系统的存在度（鲁棒性 $P$）呈现不可逆的下降趋势。
+    *   验证了 $P \times C \approx k$ 的弱守恒性。
+
+2.  **技术奇点的幻象 (The Singularity Illusion)**
+    *   即使引入类似 **Neuralink** 的技术重构机制（允许个体消耗能量降低熵增），在热力学第二定律的约束下，系统依然无法长期逆转崩溃。
+    *   *结论：技术本身也是一种代偿，它在解决问题的同时，创造了更大的能量缺口。*
+
+3.  **反脆弱性 (Antifragility in Chaos)**
+    *   在 **"火星模式" (Mars Mode)** 的极端环境压力下，保持**低复杂度**的系统反而表现出了最强的生存能力。
+    *   *启示：最好的零件就是没有零件 (The best part is no part)。*
+
+---
 
 ## 🚀 快速开始
 
-### 1. 环境准备
-
-需要 Python 3.8+ 和 Node.js 16+。
-
+### 1. 克隆仓库
 ```bash
-# 创建并激活虚拟环境
+git clone https://github.com/metart766-ui/i-ruo-dai-chang.git
+cd i-ruo-dai-chang
+```
+
+### 2. 环境准备 (Python)
+```bash
 python3 -m venv venv
 source venv/bin/activate
-
-# 安装 Python 依赖
-pip install numpy pandas matplotlib seaborn scipy fastapi uvicorn pydantic
+pip install -r requirements.txt
+# 如果没有 requirements.txt，请运行:
+# pip install numpy pandas matplotlib seaborn scipy fastapi uvicorn pydantic
 ```
 
-### 2. 运行模拟
-
-您可以直接运行脚本进行离线模拟：
-
-```bash
-# 运行标准实验
-python3 siyan_experiment.py
-
-# 运行火星模式压力测试
-python3 mars_mode_stress_test.py
-```
-
-### 3. 启动可视化平台
-
-本项目包含一个基于 Web 的交互式实验室。
-
-**后端服务**:
+### 3. 启动后端模拟引擎
 ```bash
 python3 server.py
-# 服务将启动在 http://localhost:8000
+# 服务启动在 http://localhost:8000
 ```
 
-**前端界面**:
+### 4. 启动前端可视化 (React)
 ```bash
 cd wandongyu-viz
 npm install
 npm run dev
-# 访问 http://localhost:5173
+# 浏览器访问 http://localhost:5173
 ```
 
-## 📊 实验结论摘要
+---
 
-经过多次模拟（包括极端环境测试），我们发现：
-*   **递弱代偿铁律**: 在自然演化条件下，随着代偿度（复杂度）的增加，系统的存在度（鲁棒性）呈现不可逆的下降趋势。
-*   **奇点无效**: 即使引入类似 Neuralink 的技术重构机制（Singularity Mode），在热力学第二定律的约束下，系统依然无法长期逆转熵增。
-*   **反脆弱性**: 在极端波动的环境（火星模式）中，保持低复杂度的系统反而表现出了最强的生存能力。
+## � 项目结构
+
+*   **核心模拟器**
+    *   `siyan_experiment.py`: 基础演化模型（资源约束+随机变异）。
+    *   `singularity_evolution.py`: 引入智能体与重构机制的高级模型。
+*   **压力测试**
+    *   `mars_mode_stress_test.py`: 模拟指数级环境恶化的极端测试。
+*   **数据分析**
+    *   `comprehensive_report_generator.py`: 生成包含统计学显著性检验的完整报告。
+*   **可视化前端**
+    *   `wandongyu-viz/`: 基于 React + Ant Design + Recharts 的交互式数据大屏。
+
+---
+
+## 🤝 贡献指南
+
+我们欢迎所有对**复杂系统**、**演化动力学**或**计算哲学**感兴趣的开发者参与贡献！
+
+*   **Issue**: 发现模型漏洞或有新的理论假设？请提交 Issue。
+*   **Pull Request**: 欢迎提交代码优化或新的实验场景（例如：引入博弈论机制）。
 
 ## 📜 许可证
 
-MIT License
+本项目基于 [MIT License](LICENSE) 开源。
