@@ -1,0 +1,46 @@
+{
+  "original": {
+    "name": "原始版本",
+    "creation_time": 0.00023794174194335938,
+    "creation_memory": 0.0625,
+    "total_simulation_time": 0.23405694961547852,
+    "avg_step_time": 9.675073623657227e-05,
+    "max_step_time": 0.014028072357177734,
+    "min_step_time": 1.1682510375976562e-05,
+    "final_memory": 0.0625,
+    "peak_memory": 0.328125,
+    "steps_per_second": 10335.838660233316,
+    "final_stats": {
+      "alive_count": 0,
+      "avg_complexity": 0,
+      "avg_existence": 0,
+      "total_energy": 0,
+      "pc_product": 0,
+      "environment_stress": -0.016451129843790973
+    }
+  },
+  "optimized": {
+    "name": "优化版本",
+    "creation_time": 0.6968908309936523,
+    "creation_memory": 57.28125,
+    "total_simulation_time": 0.05354905128479004,
+    "avg_step_time": 1.7226219177246093e-05,
+    "max_step_time": 0.0007789134979248047,
+    "min_step_time": 9.775161743164062e-06,
+    "final_memory": 56.515625,
+    "peak_memory": 57.0,
+    "steps_per_second": 58051.04356972818,
+    "final_stats": {
+      "total_cells": 100,
+      "avg_complexity": 2.05,
+      "avg_existence_degree": 0.7759614550832512,
+      "total_energy": 10000.0,
+      "p_times_c": 1.5907209829206648,
+      "environment_stress": 0.027964124185707026,
+      "max_complexity": 3,
+      "min_existence": 0.6580613119579956
+    }
+  },
+  "speedup": 5.616481204672536,
+  "memory_reduction": -90325.0
+}

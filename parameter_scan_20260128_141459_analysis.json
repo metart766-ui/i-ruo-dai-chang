@@ -1,0 +1,11 @@
+{
+  "total_experiments": 256,
+  "collapse_rate": 0.0,
+  "avg_final_alive_ratio": 0.9920765625000001,
+  "avg_final_c_mean": 1.0957133538152857,
+  "avg_pc_serial_correlation": 0.1894664891304068,
+  "avg_pc_env_correlation": 0.10884962997127934,
+  "avg_c_p_correlation": -0.9999976392340628,
+  "survival_avg_c_mean": 1.0957133538152857,
+  "survival_avg_alive_ratio": 0.9920765625000001
+}

@@ -1,0 +1,626 @@
+{
+  "metadata": {
+    "generated_at": "2026-01-28T15:09:48.252652",
+    "version": "1.0"
+  },
+  "experiments": {
+    "basic": {
+      "basic_stats": {
+        "alive_ratio": {
+          "mean": 0.9902266666666666,
+          "std": 0.019503802391497006,
+          "min": 0.5777777777777777,
+          "max": 1.0,
+          "final": 0.9944444444444444
+        },
+        "c_mean": {
+          "mean": 1.0927451027819344,
+          "std": 0.024607744247882063,
+          "min": 1.0192307692307692,
+          "max": 1.1599552572706937,
+          "final": 1.140782122905028
+        },
+        "p_mean_serial": {
+          "mean": 0.9671110885528909,
+          "std": 0.0002868639085684195,
+          "min": 0.9663275452342768,
+          "max": 0.9679681844177384,
+          "final": 0.966550574910886
+        },
+        "p_mean_env": {
+          "mean": 0.9690121310198573,
+          "std": 0.01678747464651922,
+          "min": 0.8949624120825491,
+          "max": 0.9899822958639256,
+          "final": 0.9890165019902728
+        },
+        "pc_serial": {
+          "mean": 1.0567988609117205,
+          "std": 0.023482358295258052,
+          "min": 0.9865829571950026,
+          "max": 1.1208967163399834,
+          "final": 1.1026236167419157
+        },
+        "pc_env": {
+          "mean": 1.0588917714761517,
+          "std": 0.030395791835182925,
+          "min": 0.94558245801482,
+          "max": 1.1352035792330826,
+          "final": 1.128252344728568
+        }
+      },
+      "final_state": {
+        "alive_ratio": 0.9944444444444444,
+        "c_mean": 1.140782122905028,
+        "p_mean_serial": 0.966550574910886,
+        "p_mean_env": 0.9890165019902728,
+        "pc_serial": 1.1026236167419157,
+        "pc_env": 1.128252344728568
+      },
+      "trends": {
+        "alive_ratio": {
+          "slope": 1.2702024141429888e-05,
+          "r_squared": 0.008853882936668073,
+          "p_value": 0.03542798620766657,
+          "trend_direction": "increasing"
+        },
+        "c_mean": {
+          "slope": 0.0001155545784915697,
+          "r_squared": 0.4603171871287372,
+          "p_value": 1.0545679610024752e-68,
+          "trend_direction": "increasing"
+        },
+        "p_mean_serial": {
+          "slope": -1.3478427386876542e-06,
+          "r_squared": 0.4608431195567937,
+          "p_value": 8.267863105957894e-69,
+          "trend_direction": "decreasing"
+        },
+        "p_mean_env": {
+          "slope": 6.237007431478148e-06,
+          "r_squared": 0.0028814312879394933,
+          "p_value": 0.23085554453683793,
+          "trend_direction": "increasing"
+        },
+        "pc_serial": {
+          "slope": 0.00011025863221791391,
+          "r_squared": 0.46022294265125585,
+          "p_value": 1.1015426296414608e-68,
+          "trend_direction": "increasing"
+        },
+        "pc_env": {
+          "slope": 0.0001187992088710099,
+          "r_squared": 0.3188795423128551,
+          "p_value": 1.8716098126767503e-43,
+          "trend_direction": "increasing"
+        }
+      },
+      "correlations": {
+        "matrix": {
+          "alive_ratio": {
+            "alive_ratio": 1.0,
+            "c_mean": 0.16514891121820216,
+            "p_mean_serial": -0.16516107283860706,
+            "p_mean_env": 0.08406245690375878,
+            "pc_serial": 0.16529375059731158,
+            "pc_env": 0.1820312826428938
+          },
+          "c_mean": {
+            "alive_ratio": 0.16514891121820216,
+            "c_mean": 1.0,
+            "p_mean_serial": -0.9999992913559319,
+            "p_mean_env": 0.0206433907017718,
+            "pc_serial": 0.9999999210448434,
+            "pc_env": 0.7970206920104953
+          },
+          "p_mean_serial": {
+            "alive_ratio": -0.16516107283860706,
+            "c_mean": -0.9999992913559319,
+            "p_mean_serial": 1.0,
+            "p_mean_env": -0.02062260396175027,
+            "pc_serial": -0.999999169419608,
+            "pc_env": -0.7970085035036225
+          },
+          "p_mean_env": {
+            "alive_ratio": 0.08406245690375878,
+            "c_mean": 0.0206433907017718,
+            "p_mean_serial": -0.02062260396175027,
+            "p_mean_env": 1.0,
+            "pc_serial": 0.020644342010039514,
+            "pc_env": 0.6201161215135229
+          },
+          "pc_serial": {
+            "alive_ratio": 0.16529375059731158,
+            "c_mean": 0.9999999210448434,
+            "p_mean_serial": -0.999999169419608,
+            "p_mean_env": 0.020644342010039514,
+            "pc_serial": 1.0,
+            "pc_env": 0.7970216410619059
+          },
+          "pc_env": {
+            "alive_ratio": 0.1820312826428938,
+            "c_mean": 0.7970206920104953,
+            "p_mean_serial": -0.7970085035036225,
+            "p_mean_env": 0.6201161215135229,
+            "pc_serial": 0.7970216410619059,
+            "pc_env": 1.0
+          }
+        },
+        "strong_correlations": [
+          {
+            "var1": "c_mean",
+            "var2": "p_mean_serial",
+            "correlation": -0.9999992913559319
+          },
+          {
+            "var1": "c_mean",
+            "var2": "pc_serial",
+            "correlation": 0.9999999210448434
+          },
+          {
+            "var1": "c_mean",
+            "var2": "pc_env",
+            "correlation": 0.7970206920104953
+          },
+          {
+            "var1": "p_mean_serial",
+            "var2": "pc_serial",
+            "correlation": -0.999999169419608
+          },
+          {
+            "var1": "p_mean_serial",
+            "var2": "pc_env",
+            "correlation": -0.7970085035036225
+          },
+          {
+            "var1": "pc_serial",
+            "var2": "pc_env",
+            "correlation": 0.7970216410619059
+          }
+        ]
+      }
+    }
+  },
+  "analysis": {
+    "parameter_scan_sensitivity": {
+      "parameter_ranges": {
+        "gamma": {
+          "min": 1.2,
+          "max": 2.0,
+          "mean": 1.625,
+          "std": 0.30370264094611865
+        },
+        "beta": {
+          "min": 0.3,
+          "max": 1.0,
+          "mean": 0.625,
+          "std": 0.2591085774380323
+        },
+        "p_up": {
+          "min": 0.03,
+          "max": 0.1,
+          "mean": 0.065,
+          "std": 0.026978568109796007
+        },
+        "r": {
+          "min": 0.95,
+          "max": 0.995,
+          "mean": 0.97875,
+          "std": 0.017489492643904137
+        }
+      },
+      "sensitivity_metrics": {
+        "grid_size": {
+          "gamma": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          },
+          "beta": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          },
+          "p_up": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          },
+          "r": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          }
+        },
+        "initial_density": {
+          "gamma": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          },
+          "beta": {
+            "correlation": -5.366465544418906e-17,
+            "sensitivity": 5.366465544418906e-17
+          },
+          "p_up": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          },
+          "r": {
+            "correlation": -1.590094442870243e-15,
+            "sensitivity": 1.590094442870243e-15
+          }
+        },
+        "initial_complexity": {
+          "gamma": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          },
+          "beta": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          },
+          "p_up": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          },
+          "r": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          }
+        },
+        "initial_energy": {
+          "gamma": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          },
+          "beta": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          },
+          "p_up": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          },
+          "r": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          }
+        },
+        "r_mean": {
+          "gamma": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          },
+          "beta": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          },
+          "p_up": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          },
+          "r": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          }
+        },
+        "r_noise": {
+          "gamma": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          },
+          "beta": {
+            "correlation": 5.366465544418906e-17,
+            "sensitivity": 5.366465544418906e-17
+          },
+          "p_up": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          },
+          "r": {
+            "correlation": 1.590094442870243e-15,
+            "sensitivity": 1.590094442870243e-15
+          }
+        },
+        "env_sigma": {
+          "gamma": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          },
+          "beta": {
+            "correlation": 5.366465544418906e-17,
+            "sensitivity": 5.366465544418906e-17
+          },
+          "p_up": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          },
+          "r": {
+            "correlation": 1.590094442870243e-15,
+            "sensitivity": 1.590094442870243e-15
+          }
+        },
+        "birth_energy_threshold": {
+          "gamma": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          },
+          "beta": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          },
+          "p_up": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          },
+          "r": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          }
+        },
+        "p_down": {
+          "gamma": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          },
+          "beta": {
+            "correlation": 5.366465544418906e-17,
+            "sensitivity": 5.366465544418906e-17
+          },
+          "p_up": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          },
+          "r": {
+            "correlation": 1.590094442870243e-15,
+            "sensitivity": 1.590094442870243e-15
+          }
+        },
+        "final_alive_ratio": {
+          "gamma": {
+            "correlation": 0.032155412818099326,
+            "sensitivity": 0.032155412818099326
+          },
+          "beta": {
+            "correlation": -0.23878783314795063,
+            "sensitivity": 0.23878783314795063
+          },
+          "p_up": {
+            "correlation": -0.04104530747127333,
+            "sensitivity": 0.04104530747127333
+          },
+          "r": {
+            "correlation": 0.8767448117506591,
+            "sensitivity": 0.8767448117506591
+          }
+        },
+        "final_c_mean": {
+          "gamma": {
+            "correlation": -0.37250842401443884,
+            "sensitivity": 0.37250842401443884
+          },
+          "beta": {
+            "correlation": -0.2752426032196964,
+            "sensitivity": 0.2752426032196964
+          },
+          "p_up": {
+            "correlation": 0.810239761065261,
+            "sensitivity": 0.810239761065261
+          },
+          "r": {
+            "correlation": -0.10123896894148009,
+            "sensitivity": 0.10123896894148009
+          }
+        },
+        "final_pc_serial": {
+          "gamma": {
+            "correlation": -0.3270185032425086,
+            "sensitivity": 0.3270185032425086
+          },
+          "beta": {
+            "correlation": -0.24381922789454527,
+            "sensitivity": 0.24381922789454527
+          },
+          "p_up": {
+            "correlation": 0.7123550415693917,
+            "sensitivity": 0.7123550415693917
+          },
+          "r": {
+            "correlation": 0.4836832832140355,
+            "sensitivity": 0.4836832832140355
+          }
+        },
+        "final_pc_env": {
+          "gamma": {
+            "correlation": -0.3540243531834655,
+            "sensitivity": 0.3540243531834655
+          },
+          "beta": {
+            "correlation": -0.40506748894444194,
+            "sensitivity": 0.40506748894444194
+          },
+          "p_up": {
+            "correlation": 0.7683719058198534,
+            "sensitivity": 0.7683719058198534
+          },
+          "r": {
+            "correlation": -0.09524110038866708,
+            "sensitivity": 0.09524110038866708
+          }
+        },
+        "collapse_detected": {
+          "gamma": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          },
+          "beta": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          },
+          "p_up": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          },
+          "r": {
+            "correlation": 0.0,
+            "sensitivity": 0.0
+          }
+        },
+        "max_c_mean": {
+          "gamma": {
+            "correlation": -0.43119237793708215,
+            "sensitivity": 0.43119237793708215
+          },
+          "beta": {
+            "correlation": -0.21786768623430022,
+            "sensitivity": 0.21786768623430022
+          },
+          "p_up": {
+            "correlation": 0.8207426368869325,
+            "sensitivity": 0.8207426368869325
+          },
+          "r": {
+            "correlation": -0.09855508881332524,
+            "sensitivity": 0.09855508881332524
+          }
+        },
+        "min_alive_ratio": {
+          "gamma": {
+            "correlation": 0.0115783407874499,
+            "sensitivity": 0.0115783407874499
+          },
+          "beta": {
+            "correlation": -0.2572209717672315,
+            "sensitivity": 0.2572209717672315
+          },
+          "p_up": {
+            "correlation": -0.008924144922609964,
+            "sensitivity": 0.008924144922609964
+          },
+          "r": {
+            "correlation": 0.9189980711226146,
+            "sensitivity": 0.9189980711226146
+          }
+        },
+        "pc_serial_correlation": {
+          "gamma": {
+            "correlation": -0.35530320160588413,
+            "sensitivity": 0.35530320160588413
+          },
+          "beta": {
+            "correlation": -0.3541563259221317,
+            "sensitivity": 0.3541563259221317
+          },
+          "p_up": {
+            "correlation": 0.19367870866861892,
+            "sensitivity": 0.19367870866861892
+          },
+          "r": {
+            "correlation": 0.18543804806020614,
+            "sensitivity": 0.18543804806020614
+          }
+        },
+        "pc_env_correlation": {
+          "gamma": {
+            "correlation": -0.35742527568038784,
+            "sensitivity": 0.35742527568038784
+          },
+          "beta": {
+            "correlation": -0.5011041083988331,
+            "sensitivity": 0.5011041083988331
+          },
+          "p_up": {
+            "correlation": 0.22519436309300295,
+            "sensitivity": 0.22519436309300295
+          },
+          "r": {
+            "correlation": 0.19320655778773785,
+            "sensitivity": 0.19320655778773785
+          }
+        },
+        "c_p_correlation": {
+          "gamma": {
+            "correlation": -0.23270319342712648,
+            "sensitivity": 0.23270319342712648
+          },
+          "beta": {
+            "correlation": -0.016276161457375045,
+            "sensitivity": 0.016276161457375045
+          },
+          "p_up": {
+            "correlation": 0.17514524264362125,
+            "sensitivity": 0.17514524264362125
+          },
+          "r": {
+            "correlation": -0.7969197455078393,
+            "sensitivity": 0.7969197455078393
+          }
+        }
+      },
+      "critical_parameters": [
+        {
+          "metric": "final_alive_ratio",
+          "parameter": "r",
+          "sensitivity": 0.8767448117506591
+        },
+        {
+          "metric": "final_c_mean",
+          "parameter": "p_up",
+          "sensitivity": 0.810239761065261
+        },
+        {
+          "metric": "final_pc_serial",
+          "parameter": "p_up",
+          "sensitivity": 0.7123550415693917
+        },
+        {
+          "metric": "final_pc_env",
+          "parameter": "p_up",
+          "sensitivity": 0.7683719058198534
+        },
+        {
+          "metric": "max_c_mean",
+          "parameter": "p_up",
+          "sensitivity": 0.8207426368869325
+        },
+        {
+          "metric": "min_alive_ratio",
+          "parameter": "r",
+          "sensitivity": 0.9189980711226146
+        },
+        {
+          "metric": "pc_env_correlation",
+          "parameter": "beta",
+          "sensitivity": 0.5011041083988331
+        },
+        {
+          "metric": "c_p_correlation",
+          "parameter": "r",
+          "sensitivity": 0.7969197455078393
+        }
+      ]
+    },
+    "long_term_sensitivity": {
+      "parameter_ranges": {},
+      "sensitivity_metrics": {},
+      "critical_parameters": []
+    }
+  },
+  "conclusions": {
+    "system_behavior": {
+      "stability": "high",
+      "description": "系统表现出高度稳定性",
+      "pc_conservation": "weak",
+      "pc_description": "P×C守恒性较弱"
+    },
+    "parameter_effects": {},
+    "critical_insights": [
+      "系统在高复杂度下仍能保持稳定性",
+      "P×C守恒趋势在不同环境条件下表现一致",
+      "代偿度C与存在度P呈现明显的负相关关系",
+      "系统具有自组织能力，能够适应环境变化"
+    ],
+    "recommendations": [
+      "进一步研究临界相变点的精确位置",
+      "探索不同初始条件对系统演化的影响",
+      "分析网络拓扑结构对稳定性的作用",
+      "研究参数空间的非线性相互作用"
+    ]
+  }
+}
