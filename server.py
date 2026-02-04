@@ -32,6 +32,9 @@ class SimulationConfig(BaseModel):
     beta: float = 0.5   # 环境敏感性
     n0: float = 1.0     # 基础依赖
     
+    # 演化策略
+    strategy: str = 'serial' # 'serial' | 'parallel'
+    
     # 奇点参数
     enable_singularity: bool = False
     refactor_threshold: int = 5
@@ -81,7 +84,7 @@ async def run_simulation(config: SimulationConfig):
         
         siyan_keys = [
             'grid_size', 'alpha', 'base_cost', 'gamma', 'r', 'n0', 'n_scale', 
-            'base_death', 'beta', 'p_up', 'p_down', 'env_sigma'
+            'base_death', 'beta', 'p_up', 'p_down', 'env_sigma', 'strategy'
         ]
         
         # 默认参数补全 (如果前端没传)

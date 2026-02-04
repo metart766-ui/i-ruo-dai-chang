@@ -24,7 +24,7 @@ We translate this philosophy into a **Cellular Automata** model:
 
 | Philosophy Concept | Simulation Variable | Mathematical Definition |
 | :--- | :--- | :--- |
-| **Existence Degree ($P$)** | **Survival Probability** | $P = r^n$ (System Reliability, where $n$ is complexity) |
+| **Existence Degree ($P$)** | **Survival Probability** | $P = r^n$ (Serial) or $1-(1-r)^n$ (Parallel) |
 | **Compensation Degree ($C$)** | **Complexity Level** | $C = n$ (Number of components/attributes) |
 | **Maintenance Cost** | **Energy Consumption** | $Cost \propto C^\gamma$ (Super-linear metabolic cost) |
 | **Evolution** | **Mutation & Selection** | Agents mutate $C$ to gain resources but pay reliability costs |
@@ -51,9 +51,10 @@ We built a modern, interactive lab interface powered by React & Ant Design.
     *   Simulations consistently show that as agents evolve to be more complex (higher $C$) to acquire resources, their system reliability ($P$) inevitably decreases.
     *   **Equation Verified**: $P \times C \approx k$ (Conservation of Existence).
 
-2.  **The Singularity Illusion (技术奇点的幻象)**
-    *   We simulated a **"Neuralink Mode"** where agents can spend energy to "refactor" their code (reduce $C$ while keeping function).
-    *   **Result**: It failed. The energy cost of refactoring accelerates resource depletion. Technology is just another form of compensation that demands higher entropy production.
+2.  **The Redundancy Paradox (冗余悖论) [NEW]**
+    *   We introduced a **Parallel Strategy** (Redundancy) to challenge the theory.
+    *   **Result**: While redundancy increases reliability ($P \uparrow$) initially, it drastically increases energy consumption ($Cost \uparrow$). The system eventually collapses not from failure, but from **resource exhaustion**.
+    *   *Conclusion: You can't cheat Thermodynamics.*
 
 3.  **Antifragility in Chaos (火星模式的反脆弱性)**
     *   In extreme environments ("Mars Mode" with exponential volatility), simple systems survival longer than complex ones.

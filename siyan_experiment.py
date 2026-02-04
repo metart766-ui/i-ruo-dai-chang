@@ -17,16 +17,19 @@ import random
 class Individual:
     """个体类，包含复杂度、能量等状态"""
     
-    def __init__(self, x: int, y: int, complexity: int = 1, energy: float = 5.0):
+    def __init__(self, x: int, y: int, complexity: int = 1, energy: float = 5.0, strategy: str = 'serial'):
         self.x = x
         self.y = y
         self.complexity = complexity  # 代偿度 C
         self.energy = energy
+        self.strategy = strategy      # 演化策略: 'serial' (串联) or 'parallel' (并联)
         self.alive = True
         self.age = 0
         
     def get_maintenance_cost(self, base_cost: float, gamma: float) -> float:
         """计算维护成本：cost(c) = base_cost * c^gamma"""
+        # 即使是并联，复杂度越高，消耗能量依然越多（因为零件多了）
+        # 规模经济通过外部的 gamma 控制
         return base_cost * (self.complexity ** gamma)
     
     def get_resource_gain(self, base_gain: float, alpha: float, local_resource: float) -> float:
@@ -34,9 +37,20 @@ class Individual:
         return base_gain * (1 + alpha * (self.complexity - 1)) * local_resource
     
     def get_reliability_survival_prob(self, r: float, n0: float, n_scale: float) -> float:
-        """可靠性串联近似：R = r^n，其中 n = n0 + n_scale * c"""
+        """根据策略计算可靠性"""
         n = n0 + n_scale * self.complexity
-        return r ** n
+        
+        if self.strategy == 'parallel':
+            # 并联策略：P = 1 - (1-r)^n (冗余备份，越复杂越可靠)
+            # 注意：这里的 n 依然是部件数量。
+            # 假设每个复杂度单位都增加了并联备份。
+            # 为了防止P过快达到1，我们假设基础不可靠性较高，或者并联效率有衰减
+            # 这里使用标准并联公式
+            prob = 1.0 - ((1.0 - r) ** n)
+            return min(0.9999, prob) # 上限略小于1
+        else:
+            # 串联策略（默认）：P = r^n (越复杂越脆弱)
+            return r ** n
     
     def get_environment_death_prob(self, base_death: float, beta: float, delta_e: float) -> float:
         """环境敏感性：death_prob = base_death + beta * c * ΔE"""
@@ -94,7 +108,8 @@ class SiyanSimulator:
                  birth_energy_threshold: float = 3.0,
                  r_mean: float = 1.0,
                  r_noise: float = 0.2,
-                 env_sigma: float = 0.05):
+                 env_sigma: float = 0.05,
+                 strategy: str = 'serial'):
         
         self.grid_size = grid_size
         self.initial_density = initial_density
@@ -114,6 +129,7 @@ class SiyanSimulator:
         self.r_mean = r_mean
         self.r_noise = r_noise
         self.env_sigma = env_sigma
+        self.strategy = strategy
         
         # 初始化环境和个体
         self.environment = Environment(grid_size, r_mean, r_noise, env_sigma)
@@ -143,7 +159,7 @@ class SiyanSimulator:
         
         for i in range(target_count):
             x, y = positions[i]
-            individual = Individual(x, y, self.initial_complexity, self.initial_energy)
+            individual = Individual(x, y, self.initial_complexity, self.initial_energy, self.strategy)
             self.grid[x][y] = individual
             self.individuals.append(individual)
     
@@ -232,7 +248,7 @@ class SiyanSimulator:
                         new_complexity = max(1, new_complexity - 1)
                     
                     # 创建新个体
-                    new_individual = Individual(nx, ny, new_complexity, self.initial_energy)
+                    new_individual = Individual(nx, ny, new_complexity, self.initial_energy, self.strategy)
                     new_individuals.append(new_individual)
                     self.grid[nx][ny] = new_individual
                     

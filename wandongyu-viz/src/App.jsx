@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { 
   Layout, Menu, Card, Statistic, Row, Col, Form, InputNumber, 
   Switch, Button, Slider, Typography, Tag, Space, Alert, Spin,
-  theme, ConfigProvider
+  theme, ConfigProvider, Select, Radio
 } from 'antd';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer,
@@ -15,7 +15,8 @@ import {
   FileTextOutlined,
   SettingOutlined,
   PlayCircleOutlined,
-  ThunderboltOutlined
+  ThunderboltOutlined,
+  BuildOutlined
 } from '@ant-design/icons';
 
 // Import data
@@ -101,6 +102,21 @@ const ConfigForm = ({ config, setConfig, onRun, loading }) => {
         </Row>
         
         <Row gutter={24}>
+           <Col span={24}>
+              <Form.Item label="演化策略 (Evolution Strategy)" name="strategy">
+                <Radio.Group buttonStyle="solid">
+                  <Radio.Button value="serial">
+                     <Space><BuildOutlined /> 串联结构 (递弱代偿模型)</Space>
+                  </Radio.Button>
+                  <Radio.Button value="parallel">
+                     <Space><BuildOutlined rotate={90} /> 并联冗余 (反脆弱挑战)</Space>
+                  </Radio.Button>
+                </Radio.Group>
+              </Form.Item>
+           </Col>
+        </Row>
+
+        <Row gutter={24}>
           <Col span={8}>
             <Form.Item label="维护成本指数 (Gamma)" name="gamma" tooltip="越高代表系统越脆弱">
               <InputNumber min={1.0} max={3.0} step={0.1} style={{ width: '100%' }} />
@@ -152,6 +168,7 @@ function App() {
     gamma: 1.5,
     beta: 0.5,
     r: 0.98,
+    strategy: 'serial',
     enable_singularity: false,
     refactor_threshold: 5,
     refactor_cost: 2.0
