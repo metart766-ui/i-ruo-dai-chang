@@ -10,12 +10,24 @@
 >
 > ("万物存在度的递减，是宇宙演化的根本方向；而代偿度的增加，只是为了对抗这种递减的权宜之计。" —— 王东岳)
 
-## 🌌 Project Overview (项目概览)
+## 🌌 Project Background (项目背景)
 
-**Entropy Compensator** is an open-source laboratory that quantifies philosophy using code. 
+This project is a computational verification of the philosophical theory **"The Theory of Progressive Compensation" (递弱代偿)** proposed by Chinese philosopher Wang Dongyue.
 
-By employing **Cellular Automata (CA)**, **System Reliability Engineering**, and **Information Theory**, we mathematically verify the core postulate of *The Theory of Progressive Compensation* (递弱代偿): 
-**Complexity ($C$) is inversely proportional to Existence ($P$).**
+### The Philosophical Core (理论核心)
+Wang argues that the evolution of the universe (from atoms to cells, to organisms, to human society) is not a process of "progress" in the traditional sense, but a process of **degeneration in existence**.
+*   **Weakening Existence ($P \downarrow$)**: As entities evolve, they become more dependent on external conditions and less stable. An atom is stable for billions of years; a human civilization can collapse in centuries.
+*   **Compensatory Complexity ($C \uparrow$)**: To survive this weakening, entities must develop complex structures (attributes, capabilities, technologies) to compensate for their lack of intrinsic stability.
+
+### The Mathematical Mapping (建模映射)
+We translate this philosophy into a **Cellular Automata** model:
+
+| Philosophy Concept | Simulation Variable | Mathematical Definition |
+| :--- | :--- | :--- |
+| **Existence Degree ($P$)** | **Survival Probability** | $P = r^n$ (System Reliability, where $n$ is complexity) |
+| **Compensation Degree ($C$)** | **Complexity Level** | $C = n$ (Number of components/attributes) |
+| **Maintenance Cost** | **Energy Consumption** | $Cost \propto C^\gamma$ (Super-linear metabolic cost) |
+| **Evolution** | **Mutation & Selection** | Agents mutate $C$ to gain resources but pay reliability costs |
 
 ---
 
@@ -25,26 +37,26 @@ We built a modern, interactive lab interface powered by React & Ant Design.
 
 ### 1. Evolution Monitor (实时演化监控)
 ![Dashboard Overview](wandongyu-viz/public/images/basic_experiment_time_series.png)
-*Tracking the inevitable decline of Existence ($P$) as Complexity ($C$) rises.*
+*Real-time tracking of the Inverse Correlation between Existence ($P$) and Complexity ($C$).*
 
 ### 2. Phase Transition Map (相变图谱)
 ![Phase Diagram](wandongyu-viz/public/images/phase_diagram.png)
-*Identifying the "Edge of Chaos" where systems collapse under their own weight.*
+*Identifying the "Edge of Chaos" where systems collapse under the weight of their own complexity.*
 
 ---
 
 ## 🧬 Key Findings (核心发现)
 
 1.  **The Iron Law of Decay (递弱铁律)**
-    *   Simulations confirm that as systems evolve to be more complex (higher $C$), their robustness (higher $P$) inevitably decreases.
-    *   **Equation**: $P \times C \approx k$ (Conservation of Existence).
+    *   Simulations consistently show that as agents evolve to be more complex (higher $C$) to acquire resources, their system reliability ($P$) inevitably decreases.
+    *   **Equation Verified**: $P \times C \approx k$ (Conservation of Existence).
 
 2.  **The Singularity Illusion (技术奇点的幻象)**
-    *   Even with **"Neuralink-like"** mechanisms (spending energy to refactor/optimize code), systems cannot escape entropy indefinitely.
-    *   *Insight: Technology is just another form of compensation that demands higher energy maintenance.*
+    *   We simulated a **"Neuralink Mode"** where agents can spend energy to "refactor" their code (reduce $C$ while keeping function).
+    *   **Result**: It failed. The energy cost of refactoring accelerates resource depletion. Technology is just another form of compensation that demands higher entropy production.
 
 3.  **Antifragility in Chaos (火星模式的反脆弱性)**
-    *   In extreme environments ("Mars Mode"), simpler systems survival longer than complex ones.
+    *   In extreme environments ("Mars Mode" with exponential volatility), simple systems survival longer than complex ones.
     *   *Musk's Philosophy Verified: "The best part is no part."*
 
 ---
