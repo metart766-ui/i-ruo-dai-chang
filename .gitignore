@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+1brain-prototype/
+.trae/
+node_modules/
+.DS_Store
+dist/
