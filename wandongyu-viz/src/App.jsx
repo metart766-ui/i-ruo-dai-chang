@@ -85,17 +85,29 @@ const ConfigForm = ({ config, setConfig, onRun, loading }) => {
       >
         <Row gutter={24}>
           <Col span={8}>
-            <Form.Item label="网格大小 (Grid Size)" name="grid_size">
+            <Form.Item 
+                label="网格大小 (Grid Size)" 
+                name="grid_size"
+                tooltip="决定了模拟世界的物理空间大小。越大的世界容纳越多生命，但计算越慢。"
+            >
               <Slider min={10} max={100} step={10} marks={{10:'10', 50:'50', 100:'100'}} />
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="模拟步数 (Steps)" name="steps">
+            <Form.Item 
+                label="模拟步数 (Steps)" 
+                name="steps"
+                tooltip="模拟演化的时间长度。1000步大约相当于文明演化一万年。"
+            >
               <InputNumber min={100} max={5000} step={100} style={{ width: '100%' }} />
             </Form.Item>
           </Col>
           <Col span={8}>
-             <Form.Item label="基础可靠性 (r)" name="r">
+             <Form.Item 
+                label="基础可靠性 (r)" 
+                name="r"
+                tooltip="单个零件/细胞不发生故障的概率。0.99 意味着每100次运行有1次故障。"
+             >
               <Slider min={0.90} max={0.999} step={0.001} tooltip={{ formatter: (value) => `${value}` }} />
             </Form.Item>
           </Col>
@@ -103,13 +115,17 @@ const ConfigForm = ({ config, setConfig, onRun, loading }) => {
         
         <Row gutter={24}>
            <Col span={24}>
-              <Form.Item label="演化策略 (Evolution Strategy)" name="strategy">
+              <Form.Item 
+                label="演化策略 (Evolution Strategy)" 
+                name="strategy"
+                tooltip="文明选择的发展路径：串联结构追求极致效率但脆弱；并联冗余追求安全但消耗巨大能量。"
+              >
                 <Radio.Group buttonStyle="solid">
                   <Radio.Button value="serial">
-                     <Space><BuildOutlined /> 串联结构 (递弱代偿模型)</Space>
+                     <Space><BuildOutlined /> 串联结构 (递弱代偿模型 - 越复杂越脆弱)</Space>
                   </Radio.Button>
                   <Radio.Button value="parallel">
-                     <Space><BuildOutlined rotate={90} /> 并联冗余 (反脆弱挑战)</Space>
+                     <Space><BuildOutlined rotate={90} /> 并联冗余 (反脆弱挑战 - 越复杂越安全?)</Space>
                   </Radio.Button>
                 </Radio.Group>
               </Form.Item>
@@ -118,17 +134,30 @@ const ConfigForm = ({ config, setConfig, onRun, loading }) => {
 
         <Row gutter={24}>
           <Col span={8}>
-            <Form.Item label="维护成本指数 (Gamma)" name="gamma" tooltip="越高代表系统越脆弱">
+            <Form.Item 
+                label="维护成本指数 (Gamma)" 
+                name="gamma" 
+                tooltip="复杂度每增加一点，需要消耗多少能量来维持？Gamma > 1 代表成本爆炸增长（熵增）。"
+            >
               <InputNumber min={1.0} max={3.0} step={0.1} style={{ width: '100%' }} />
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="环境敏感性 (Beta)" name="beta" tooltip="越高代表环境波动影响越大">
+            <Form.Item 
+                label="环境敏感性 (Beta)" 
+                name="beta" 
+                tooltip="外界环境变化对个体的影响程度。数值越大，环境一变，死得越快。"
+            >
               <InputNumber min={0.0} max={2.0} step={0.1} style={{ width: '100%' }} />
             </Form.Item>
           </Col>
           <Col span={8}>
-             <Form.Item label="奇点模式 (Neuralink Mode)" name="enable_singularity" valuePropName="checked">
+             <Form.Item 
+                label="奇点模式 (Neuralink Mode)" 
+                name="enable_singularity" 
+                valuePropName="checked"
+                tooltip="是否允许文明消耗巨额能量来重构自身代码（技术奇点），试图逆天改命。"
+             >
                <Switch 
                  checkedChildren={<Space><ThunderboltOutlined /> 开启</Space>} 
                  unCheckedChildren="关闭" 
