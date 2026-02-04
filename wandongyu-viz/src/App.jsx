@@ -1,8 +1,12 @@
 import React, { useState, useMemo } from 'react';
+import { Player } from '@remotion/player';
+import { EvolutionVideo } from './components/EvolutionVideo';
+import { PromoVideo } from './components/PromoVideo';
 import { 
   Layout, Menu, Card, Statistic, Row, Col, Form, InputNumber, 
   Switch, Button, Slider, Typography, Tag, Space, Alert, Spin,
-  theme, ConfigProvider, Select, Radio
+  theme, ConfigProvider, Select, Radio, Timeline, Descriptions, Badge, Divider,
+  Segmented
 } from 'antd';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer,
@@ -16,7 +20,10 @@ import {
   SettingOutlined,
   PlayCircleOutlined,
   ThunderboltOutlined,
-  BuildOutlined
+  BuildOutlined,
+  ClockCircleOutlined,
+  CheckCircleOutlined,
+  ExclamationCircleOutlined
 } from '@ant-design/icons';
 
 // Import data
@@ -57,7 +64,7 @@ const ConfigForm = ({ config, setConfig, onRun, loading }) => {
     form.setFieldsValue(config);
   }, [config, form]);
 
-  const handleValuesChange = (changedValues, allValues) => {
+  const handleValuesChange = (changedValues) => {
     setConfig({ ...config, ...changedValues });
   };
 
@@ -66,15 +73,35 @@ const ConfigForm = ({ config, setConfig, onRun, loading }) => {
       title={<Space><SettingOutlined /><span>实验参数配置</span></Space>} 
       className="shadow-sm mb-6"
       extra={
-        <Button 
-          type="primary" 
-          icon={<PlayCircleOutlined />} 
-          loading={loading}
-          onClick={onRun}
-          size="large"
-        >
-          运行模拟
-        </Button>
+        <Space>
+          <Button 
+            onClick={() => {
+              setConfig({
+                ...config,
+                grid_size: 100,
+                steps: 5000,
+                r: 0.999, // 分子极其稳定
+                strategy: 'serial',
+                gamma: 1.01, // 几乎没有维护成本
+                beta: 0.1,   // 不怕环境
+                resource_clustering: 0.8, // 原始汤里的有机分子团
+                crowding_cost: 0.0,
+                mutation_volatility: 0.05 // 允许跃迁成为细胞
+              });
+            }}
+          >
+            🧪 创世纪 (Genesis)
+          </Button>
+          <Button 
+            type="primary" 
+            icon={<PlayCircleOutlined />} 
+            loading={loading}
+            onClick={onRun}
+            size="large"
+          >
+            运行模拟
+          </Button>
+        </Space>
       }
     >
       <Form
@@ -135,6 +162,36 @@ const ConfigForm = ({ config, setConfig, onRun, loading }) => {
         <Row gutter={24}>
           <Col span={8}>
             <Form.Item 
+                label="资源聚集度 (Resource Clustering)" 
+                name="resource_clustering" 
+                tooltip="资源分布的不均匀程度。0=均匀分布，1=极度聚集（富人区与贫民窟）。迫使个体迁徙或竞争。"
+            >
+              <Slider min={0.0} max={1.0} step={0.1} />
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item 
+                label="内卷系数 (Crowding Cost)" 
+                name="crowding_cost" 
+                tooltip="拥挤带来的额外能耗。如果周围人太多，生存成本会指数级上升（内卷）。"
+            >
+              <InputNumber min={0.0} max={1.0} step={0.01} style={{ width: '100%' }} />
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+             <Form.Item 
+                label="突变剧烈度 (Mutation Volatility)" 
+                name="mutation_volatility" 
+                tooltip="发生剧烈进化（跃迁）的概率。模拟寒武纪大爆发或突然的退化。"
+             >
+               <Slider min={0.0} max={0.1} step={0.001} tooltip={{ formatter: (value) => `${(value*100).toFixed(1)}%` }} />
+             </Form.Item>
+          </Col>
+        </Row>
+
+        <Row gutter={24}>
+          <Col span={8}>
+            <Form.Item 
                 label="维护成本指数 (Gamma)" 
                 name="gamma" 
                 tooltip="复杂度每增加一点，需要消耗多少能量来维持？Gamma > 1 代表成本爆炸增长（熵增）。"
@@ -165,6 +222,23 @@ const ConfigForm = ({ config, setConfig, onRun, loading }) => {
              </Form.Item>
           </Col>
         </Row>
+        
+        <Row gutter={24}>
+           <Col span={24}>
+              <Form.Item 
+                label="平行宇宙对照 (Multiverse A/B Test)" 
+                name="dual_mode" 
+                valuePropName="checked"
+                tooltip="同时运行两个宇宙：A宇宙遵循'递弱代偿'(越复杂越脆弱)，B宇宙遵循'达尔文进化'(越复杂越强)。直接对比两种法则下的文明命运。"
+              >
+                <Switch 
+                  checkedChildren={<Space><ExperimentOutlined /> 双宇宙对比模式开启</Space>} 
+                  unCheckedChildren="单宇宙模式" 
+                  size="large"
+                />
+              </Form.Item>
+           </Col>
+        </Row>
 
         {config.enable_singularity && (
           <Row gutter={24} className="bg-blue-50 p-4 rounded-lg mb-4">
@@ -185,10 +259,214 @@ const ConfigForm = ({ config, setConfig, onRun, loading }) => {
   );
 };
 
+const ExperimentReport = ({ stats, config, timeSeries }) => {
+  // 1. 动态分析逻辑
+  const finalAliveRatio = stats.alive_ratio;
+  const isCollapse = finalAliveRatio < 0.1;
+  const isHealthy = finalAliveRatio > 0.8;
+  
+  // 计算熵增速率 (C的平均增长率)
+  const cGrowth = timeSeries.length > 100 
+    ? (timeSeries[timeSeries.length-1].c_mean - timeSeries[0].c_mean) 
+    : 0;
+
+  // 辅助函数：获取文明阶段描述
+  const getCivilizationStage = (c) => {
+      if (c < 1.5) return "混沌期 (Chaos) - 原始汤中的随机分子";
+      if (c < 2.5) return "单细胞时代 (Prokaryotic) - 简单的生命形式出现";
+      if (c < 5.0) return "多细胞爆发 (Cambrian) - 复杂的生物体开始涌现";
+      if (c < 8.0) return "原始部落 (Tribal) - 早期社会结构形成";
+      if (c < 12.0) return "农业文明 (Agricultural) - 稳定的资源生产体系";
+      if (c < 18.0) return "工业革命 (Industrial) - 机械化与能源消耗激增";
+      if (c < 25.0) return "信息时代 (Information) - 全球互联的数字网络";
+      return "赛博格奇点 (Singularity) - 硅基生命与意识上传";
+  };
+
+  // 历史事件提取
+  const generateTimeline = () => {
+    const events = [];
+    events.push({ 
+        color: 'green', 
+        dot: <ClockCircleOutlined />,
+        children: `Step 0: 宇宙大爆炸 - ${getCivilizationStage(config.initial_complexity || 1)}` 
+    });
+    
+    // 寻找关键节点
+    let peakC = 0;
+    let peakCStep = 0;
+    let halfPopStep = null;
+    let collapseStep = null;
+    let lastStage = "";
+
+    timeSeries.forEach((step, index) => {
+        // 记录文明阶段跃迁
+        if (index % 100 === 0) { // 每100步检查一次，避免事件太密
+             const currentStage = getCivilizationStage(step.c_mean);
+             if (currentStage !== lastStage && step.c_mean > 1.5) {
+                 events.push({
+                     color: 'blue',
+                     children: `Step ${step.step}: 文明晋升 - 进入 ${currentStage}`
+                 });
+                 lastStage = currentStage;
+             }
+        }
+
+        // 记录复杂度峰值
+        if (step.c_mean > peakC) {
+            peakC = step.c_mean;
+            peakCStep = step.step;
+        }
+        // 记录人口减半点
+        if (!halfPopStep && step.alive_ratio < 0.5) {
+            halfPopStep = step.step;
+        }
+        // 记录崩溃点
+        if (!collapseStep && step.alive_ratio < 0.05) {
+            collapseStep = step.step;
+        }
+    });
+
+    if (peakCStep > 0 && peakC > 1.5) {
+        events.push({
+            color: 'gold',
+            dot: <ThunderboltOutlined />,
+            children: `Step ${peakCStep}: 黄金时代 (Golden Age) - 复杂度达到巅峰 C=${peakC.toFixed(2)}`
+        });
+    }
+
+    if (halfPopStep) {
+        events.push({
+            color: 'orange',
+            dot: <ExclamationCircleOutlined />,
+            children: `Step ${halfPopStep}: 大衰退 (Great Recession) - 存活率跌破 50%，资源开始枯竭`
+        });
+    }
+
+    if (collapseStep) {
+        events.push({
+            color: 'red',
+            children: `Step ${collapseStep}: 文明崩溃 (Collapse) - 系统停止响应，如同罗马帝国的陨落`
+        });
+    } else {
+        events.push({
+            color: 'green',
+            dot: <CheckCircleOutlined />,
+            children: `Step ${timeSeries.length > 0 ? timeSeries[timeSeries.length-1].step : 'End'}: 演化终局 - 系统${isHealthy ? '依然健在' : '苟延残喘'}，处于 ${getCivilizationStage(stats.c_mean)}`
+        });
+    }
+    
+    // 按时间排序
+    return events.sort((a, b) => {
+        const stepA = parseInt(a.children.match(/Step (\d+)/)?.[1] || 0);
+        const stepB = parseInt(b.children.match(/Step (\d+)/)?.[1] || 0);
+        return stepA - stepB;
+    });
+  };
+  
+  // 判定死亡原因
+  let deathReason = "未知原因";
+  if (config.strategy === 'parallel' && stats.p_mean_serial > 0.9 && isCollapse) {
+    deathReason = "资源耗尽 (Resource Exhaustion) - 冗余带来了不可承受的能耗成本";
+  } else if (stats.p_mean_serial < 0.5) {
+    deathReason = "系统故障 (System Failure) - 复杂度过高导致可靠性崩盘";
+  } else {
+    deathReason = "自然选择压力 (Natural Selection)";
+  }
+
+  return (
+    <Space direction="vertical" size="large" style={{ width: '100%' }}>
+      <Card title={<Space><FileTextOutlined /><span>全维度实验报告 (Experiment Log)</span></Space>} bordered={false}>
+        
+        {/* 状态总览 */}
+        <Alert
+          message={isHealthy ? "系统状态：健康 (Stable)" : (isCollapse ? "系统状态：已崩溃 (Collapsed)" : "系统状态：亚健康 (Sub-optimal)")}
+          description={`经过 ${config.steps} 步演化，系统最终存活率为 ${(finalAliveRatio * 100).toFixed(2)}%。`}
+          type={isHealthy ? "success" : (isCollapse ? "error" : "warning")}
+          showIcon
+          className="mb-6"
+        />
+
+        {/* 平行宇宙对比 (如果开启) */}
+        {config.dual_mode && (
+            <>
+                <Divider orientation="left"><ExperimentOutlined /> 平行宇宙最终对决</Divider>
+                <Row gutter={24}>
+                    <Col span={12}>
+                        <Card type="inner" title="Universe A: 递弱代偿 (Entropy)" className="bg-purple-50">
+                            <Descriptions column={1} size="small">
+                                <Descriptions.Item label="最终存活率">{(stats.alive_ratio * 100).toFixed(2)}%</Descriptions.Item>
+                                <Descriptions.Item label="最终复杂度 (C)">{stats.c_mean.toFixed(2)}</Descriptions.Item>
+                                <Descriptions.Item label="最终可靠性 (P)">{stats.p_mean_serial.toFixed(4)}</Descriptions.Item>
+                            </Descriptions>
+                        </Card>
+                    </Col>
+                    <Col span={12}>
+                        <Card type="inner" title="Universe B: 达尔文进化 (Darwin)" className="bg-green-50">
+                            <Descriptions column={1} size="small">
+                                <Descriptions.Item label="最终存活率">{(stats.alive_ratio_b * 100).toFixed(2)}%</Descriptions.Item>
+                                <Descriptions.Item label="最终复杂度 (C)">{stats.c_mean_b.toFixed(2)}</Descriptions.Item>
+                                <Descriptions.Item label="最终可靠性 (P)">{stats.p_mean_b.toFixed(4)}</Descriptions.Item>
+                            </Descriptions>
+                        </Card>
+                    </Col>
+                </Row>
+                <div className="mt-4 p-4 bg-gray-100 rounded">
+                    <Text strong>对比结论：</Text> 
+                    {stats.alive_ratio_b > stats.alive_ratio 
+                        ? " 达尔文宇宙胜出。在这个模拟设定下，'优胜劣汰'战胜了'递弱代偿'。但这可能意味着我们的参数设定过于乐观。"
+                        : " 递弱代偿宇宙胜出。即便引入了进化优势，热力学熵增依然是不可逾越的高墙。"}
+                </div>
+                <Divider />
+            </>
+        )}
+
+        <Row gutter={24}>
+            <Col span={14}>
+                 <Title level={4}>1. 演化编年史 (Timeline)</Title>
+                 <div className="mt-4">
+                    <Timeline items={generateTimeline()} />
+                 </div>
+            </Col>
+            <Col span={10}>
+                <Title level={4}>2. 关键指标复盘</Title>
+                <Descriptions bordered column={1} size="small" className="mt-4">
+                    <Descriptions.Item label="初始设定">
+                        {config.resource_clustering > 0.5 ? "贫富差距悬殊 (High Clustering)" : "资源均匀分布"}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="突变策略">
+                        {config.mutation_volatility > 0 ? "激进跃迁 (High Volatility)" : "渐进式改良"}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="内卷程度">
+                        {config.crowding_cost > 0.3 ? "高度内卷 (High Crowding Cost)" : "低竞争环境"}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="代偿增长">
+                        <Space>
+                            <Badge status={cGrowth > 0 ? "processing" : "default"} />
+                            <span>+{cGrowth.toFixed(2)} 单位</span>
+                        </Space>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="主要死因">
+                         <Tag color="red">{deathReason}</Tag>
+                    </Descriptions.Item>
+                </Descriptions>
+            </Col>
+        </Row>
+          
+        <div className="bg-gray-50 p-4 rounded-lg mt-8 border border-gray-200">
+            <Text type="secondary" italic>
+              "我们所见到的一切文明辉煌，不过是物种为了在递弱的存境中苟延残喘，而被迫堆砌出的华丽墓碑。" —— 模拟器总结
+            </Text>
+        </div>
+      </Card>
+    </Space>
+  );
+};
+
 function App() {
   const [activeMenu, setActiveMenu] = useState('overview');
   const [timeSeriesData, setTimeSeriesData] = useState(defaultTimeSeriesData);
   const [loading, setLoading] = useState(false);
+  const [videoMode, setVideoMode] = useState('replay'); // 'replay' | 'promo'
   
   // 默认配置
   const [config, setConfig] = useState({
@@ -198,16 +476,26 @@ function App() {
     beta: 0.5,
     r: 0.98,
     strategy: 'serial',
+    // v2.0 New Params
+    resource_clustering: 0.0,
+    crowding_cost: 0.0,
+    mutation_volatility: 0.0,
     enable_singularity: false,
     refactor_threshold: 5,
-    refactor_cost: 2.0
+    refactor_cost: 2.0,
+    // v3.0 New Params
+    dual_mode: false
   });
 
   const [currentStats, setCurrentStats] = useState({
     alive_ratio: reportData.experiments.basic.basic_stats.alive_ratio.final,
     c_mean: reportData.experiments.basic.basic_stats.c_mean.final,
     p_mean_serial: reportData.experiments.basic.basic_stats.p_mean_serial.final,
-    pc_serial: reportData.experiments.basic.basic_stats.pc_serial.final
+    pc_serial: reportData.experiments.basic.basic_stats.pc_serial.final,
+    // Dual mode data defaults
+    alive_ratio_b: 0,
+    c_mean_b: 0,
+    p_mean_b: 0
   });
 
   const runSimulation = async () => {
@@ -227,12 +515,30 @@ function App() {
         setTimeSeriesData(result.data);
         
         const lastStep = result.data[result.data.length - 1];
-        setCurrentStats({
-          alive_ratio: lastStep.alive_ratio,
-          c_mean: lastStep.c_mean,
-          p_mean_serial: lastStep.p_mean_serial,
-          pc_serial: lastStep.pc_serial
-        });
+        
+        if (result.mode === 'dual') {
+             setCurrentStats({
+              alive_ratio: lastStep.alive_ratio_a,
+              c_mean: lastStep.c_mean_a,
+              p_mean_serial: lastStep.p_mean_a,
+              pc_serial: lastStep.c_mean_a * lastStep.p_mean_a, // approx
+              // Universe B
+              alive_ratio_b: lastStep.alive_ratio_b,
+              c_mean_b: lastStep.c_mean_b,
+              p_mean_b: lastStep.p_mean_b,
+            });
+        } else {
+            setCurrentStats({
+              alive_ratio: lastStep.alive_ratio,
+              c_mean: lastStep.c_mean,
+              p_mean_serial: lastStep.p_mean_serial,
+              pc_serial: lastStep.pc_serial,
+              // Reset B
+              alive_ratio_b: 0,
+              c_mean_b: 0,
+              p_mean_b: 0
+            });
+        }
       } else {
         Alert.error('模拟失败', result.detail);
       }
@@ -256,6 +562,7 @@ function App() {
     { key: 'overview', icon: <DashboardOutlined />, label: '总览看板' },
     { key: 'charts', icon: <LineChartOutlined />, label: '演化分析' },
     { key: 'phase', icon: <ExperimentOutlined />, label: '相变图谱' },
+    { key: 'video', icon: <PlayCircleOutlined />, label: '视频回放' },
     { key: 'report', icon: <FileTextOutlined />, label: '实验报告' },
   ];
 
@@ -369,8 +676,14 @@ function App() {
                             <YAxis yAxisId="right" orientation="right" />
                             <RechartsTooltip />
                             <Legend />
-                            <Line yAxisId="left" type="monotone" dataKey="p_mean_serial" name="存在度 (P)" stroke="#722ed1" dot={false} />
-                            <Line yAxisId="right" type="monotone" dataKey="c_mean" name="代偿度 (C)" stroke="#1677ff" dot={false} />
+                            <Line yAxisId="left" type="monotone" dataKey="p_mean_serial" name={config.dual_mode ? "存在度 P (递弱代偿宇宙)" : "存在度 (P)"} stroke="#722ed1" dot={false} strokeWidth={2} />
+                            {config.dual_mode && (
+                               <Line yAxisId="left" type="monotone" dataKey="p_mean_b" name="存在度 P (达尔文宇宙)" stroke="#52c41a" dot={false} strokeDasharray="5 5" strokeWidth={2} />
+                            )}
+                            <Line yAxisId="right" type="monotone" dataKey="c_mean" name={config.dual_mode ? "代偿度 C (递弱代偿宇宙)" : "代偿度 (C)"} stroke="#1677ff" dot={false} />
+                            {config.dual_mode && (
+                               <Line yAxisId="right" type="monotone" dataKey="c_mean_b" name="代偿度 C (达尔文宇宙)" stroke="#13c2c2" dot={false} strokeDasharray="5 5" />
+                            )}
                           </LineChart>
                         </ResponsiveContainer>
                       </div>
@@ -438,28 +751,54 @@ function App() {
               </Row>
             )}
 
+            {activeMenu === 'video' && (
+              <Space direction="vertical" size="large" style={{ width: '100%' }}>
+                <Card 
+                    title="演化过程视频回放 (Remotion Powered)" 
+                    bordered={false}
+                    extra={
+                        <Segmented
+                            value={videoMode}
+                            onChange={setVideoMode}
+                            options={[
+                                { label: '演化回放 (Replay)', value: 'replay', icon: <PlayCircleOutlined /> },
+                                { label: '项目宣传片 (Promo)', value: 'promo', icon: <ThunderboltOutlined /> },
+                            ]}
+                        />
+                    }
+                >
+                   <div className="flex justify-center bg-gray-900 p-8 rounded-lg">
+                      <Player
+                        key={videoMode} // Force re-render when mode changes
+                        component={videoMode === 'replay' ? EvolutionVideo : PromoVideo}
+                        inputProps={{ data: timeSeriesData, config: config }}
+                        durationInFrames={videoMode === 'replay' ? 30 * 10 : 30 * 24} // Replay: 10s, Promo: 24s
+                        fps={30}
+                        compositionWidth={1280}
+                        compositionHeight={720}
+                        style={{
+                          width: '100%',
+                          maxWidth: 800,
+                          aspectRatio: '16/9',
+                        }}
+                        controls
+                        autoPlay
+                        loop
+                      />
+                   </div>
+                   <div className="mt-4 text-center text-gray-500">
+                     <Text type="secondary">
+                        {videoMode === 'replay' 
+                            ? "* 实时渲染当前的演化数据。调整参数后，视频内容会自动更新。"
+                            : "* 自动生成的项目宣传片，包含片头、理论介绍、模拟演示和片尾。"}
+                     </Text>
+                   </div>
+                </Card>
+              </Space>
+            )}
+
             {activeMenu === 'report' && (
-              <Card title="实验结论" bordered={false}>
-                <Typography>
-                  <Title level={3}>主要发现</Title>
-                  <Paragraph>
-                    <ul>
-                      <li>
-                        <Text strong>系统稳定性：</Text> 
-                        最终存活率为 <Text type={currentStats.alive_ratio > 0.8 ? "success" : "danger"}>{(currentStats.alive_ratio * 100).toFixed(2)}%</Text>。
-                      </li>
-                      <li>
-                        <Text strong>P×C 关系：</Text> 
-                        实验数据验证了 P 和 C 之间的显著负相关关系。
-                      </li>
-                      <li>
-                        <Text strong>参数敏感性：</Text> 
-                        系统对维护成本指数(γ)最为敏感。
-                      </li>
-                    </ul>
-                  </Paragraph>
-                </Typography>
-              </Card>
+              <ExperimentReport stats={currentStats} config={config} timeSeries={timeSeriesData} />
             )}
           </Content>
         </Layout>

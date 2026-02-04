@@ -35,10 +35,18 @@ class SimulationConfig(BaseModel):
     # 演化策略
     strategy: str = 'serial' # 'serial' | 'parallel'
     
+    # 复杂环境参数 (v2.0 新增)
+    resource_clustering: float = 0.0
+    crowding_cost: float = 0.0
+    mutation_volatility: float = 0.0
+    
     # 奇点参数
     enable_singularity: bool = False
     refactor_threshold: int = 5
     refactor_cost: float = 2.0
+    
+    # 双宇宙模式 (v3.0)
+    dual_mode: bool = False
     
     # 随机种子
     seed: Optional[int] = None
@@ -84,7 +92,8 @@ async def run_simulation(config: SimulationConfig):
         
         siyan_keys = [
             'grid_size', 'alpha', 'base_cost', 'gamma', 'r', 'n0', 'n_scale', 
-            'base_death', 'beta', 'p_up', 'p_down', 'env_sigma', 'strategy'
+            'base_death', 'beta', 'p_up', 'p_down', 'env_sigma', 'strategy',
+            'resource_clustering', 'crowding_cost', 'mutation_volatility'
         ]
         
         # 默认参数补全 (如果前端没传)
@@ -120,39 +129,86 @@ async def run_simulation(config: SimulationConfig):
         print(f"模拟器参数: {sim_params}")
         
         # 使用 SingularitySimulator，因为它兼容两者（通过 enable_singularity 开关）
-        simulator = SingularitySimulator(**sim_params)
-        
-        # 运行模拟
-        simulator.run_simulation(steps)
-        
-        # 提取结果
-        history = simulator.history
-        
-        # 转换为前端友好的格式 (List of Dicts)
-        result_data = []
-        for i in range(len(history['step'])):
-            item = {
-                'step': int(history['step'][i]),
-                'alive_ratio': float(history['alive_ratio'][i]),
-                'c_mean': float(history['c_mean'][i]),
-                'p_mean_serial': float(history['p_mean_serial'][i]),
-                'pc_serial': float(history['pc_serial'][i]),
-            }
-            # 如果有奇点事件数据
-            if 'singularity_events' in history and i < len(history['singularity_events']):
-                 item['singularity_events'] = int(history['singularity_events'][i])
+        if config.dual_mode:
+            print("启动双宇宙平行模拟...")
+            # 宇宙 A (当前参数，默认 strategy)
+            # 如果前端传的是 'serial'，那就是标准的递弱代偿宇宙
+            # 如果前端传的是 'parallel'，那就是两个都是 parallel，没意义
+            # 所以在 dual_mode 下，我们强制：
+            # Universe A = 'serial' (Entropy World)
+            # Universe B = 'darwin' (Darwinian World) - 我们刚才在 siyan_experiment.py 里加了 'darwin' 策略
             
-            result_data.append(item)
+            # Universe A
+            params_a = sim_params.copy()
+            params_a['strategy'] = 'serial'
+            sim_a = SingularitySimulator(**params_a)
+            sim_a.run_simulation(steps)
             
-        return {
-            "status": "success",
-            "data": result_data,
-            "final_stats": {
-                "alive_ratio": float(history['alive_ratio'][-1]),
-                "c_mean": float(history['c_mean'][-1]),
-                "p_mean_serial": float(history['p_mean_serial'][-1])
+            # Universe B
+            params_b = sim_params.copy()
+            params_b['strategy'] = 'darwin' # 必须确保 SiyanSimulator 支持这个
+            sim_b = SingularitySimulator(**params_b)
+            sim_b.run_simulation(steps)
+            
+            # 合并结果
+            history_a = sim_a.history
+            history_b = sim_b.history
+            
+            result_data = []
+            for i in range(len(history_a['step'])):
+                item = {
+                    'step': int(history_a['step'][i]),
+                    # Universe A Data
+                    'alive_ratio_a': float(history_a['alive_ratio'][i]),
+                    'c_mean_a': float(history_a['c_mean'][i]),
+                    'p_mean_a': float(history_a['p_mean_serial'][i]),
+                    # Universe B Data
+                    'alive_ratio_b': float(history_b['alive_ratio'][i]),
+                    'c_mean_b': float(history_b['c_mean'][i]),
+                    'p_mean_b': float(history_b['p_mean_serial'][i]), # 注意：这里虽然叫 p_mean_serial，但其实是 B 宇宙的 P
+                }
+                result_data.append(item)
+                
+            return {
+                "status": "success",
+                "mode": "dual",
+                "data": result_data
             }
-        }
+            
+        else:
+            # 单宇宙模式 (兼容旧版)
+            simulator = SingularitySimulator(**sim_params)
+            simulator.run_simulation(steps)
+            
+            # 提取结果
+            history = simulator.history
+            
+            # 转换为前端友好的格式 (List of Dicts)
+            result_data = []
+            for i in range(len(history['step'])):
+                item = {
+                    'step': int(history['step'][i]),
+                    'alive_ratio': float(history['alive_ratio'][i]),
+                    'c_mean': float(history['c_mean'][i]),
+                    'p_mean_serial': float(history['p_mean_serial'][i]),
+                    'pc_serial': float(history['pc_serial'][i]),
+                }
+                # 如果有奇点事件数据
+                if 'singularity_events' in history and i < len(history['singularity_events']):
+                     item['singularity_events'] = int(history['singularity_events'][i])
+                
+                result_data.append(item)
+                
+            return {
+                "status": "success",
+                "mode": "single",
+                "data": result_data,
+                "final_stats": {
+                    "alive_ratio": float(history['alive_ratio'][-1]),
+                    "c_mean": float(history['c_mean'][-1]),
+                    "p_mean_serial": float(history['p_mean_serial'][-1])
+                }
+            }
         
     except Exception as e:
         import traceback

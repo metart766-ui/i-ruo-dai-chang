@@ -48,8 +48,17 @@ class Individual:
             # 这里使用标准并联公式
             prob = 1.0 - ((1.0 - r) ** n)
             return min(0.9999, prob) # 上限略小于1
+        elif self.strategy == 'darwin':
+            # 达尔文策略 (Universe B): 复杂度带来适应性提升
+            # 假设：复杂度越高，抵抗环境风险的能力越强，基础生存率越高
+            # P = r * (1 + k * log(n))，或者简单的 sigmoid 函数
+            # 这里我们设计一个反转的模型：n 越大，P 越高，但也越难维持能量
+            # 让 P 随 n 缓慢上升，逼近 1.0
+            base_prob = r ** n0 # 基础生存率
+            adaptation = 1.0 - (1.0 - base_prob) * (0.9 ** (self.complexity - 1))
+            return min(0.9999, adaptation)
         else:
-            # 串联策略（默认）：P = r^n (越复杂越脆弱)
+            # 串联策略（默认，Universe A）：P = r^n (越复杂越脆弱)
             return r ** n
     
     def get_environment_death_prob(self, base_death: float, beta: float, delta_e: float) -> float:
@@ -60,11 +69,12 @@ class Individual:
 class Environment:
     """环境类，管理资源场和宏观参数"""
     
-    def __init__(self, grid_size: int, r_mean: float, r_noise: float, env_sigma: float):
+    def __init__(self, grid_size: int, r_mean: float, r_noise: float, env_sigma: float, resource_clustering: float = 0.0):
         self.grid_size = grid_size
         self.r_mean = r_mean
         self.r_noise = r_noise
         self.env_sigma = env_sigma
+        self.resource_clustering = resource_clustering # 保存参数
         self.resource_field = np.random.normal(r_mean, r_noise, (grid_size, grid_size))
         self.macro_parameter = 0.0  # E_t
         self.prev_macro_parameter = 0.0
@@ -76,7 +86,25 @@ class Environment:
         self.macro_parameter += np.random.normal(0, self.env_sigma)
         
         # 更新资源场（带随机扰动）
-        self.resource_field = np.random.normal(self.r_mean, self.r_noise, (self.grid_size, self.grid_size))
+        # 基础资源场
+        base_field = np.random.normal(self.r_mean, self.r_noise, (self.grid_size, self.grid_size))
+        
+        # 如果有资源聚集度 (Clustering)，叠加一些高资源区域
+        # 我们用 Perlin Noise 的简化版或随机热点模拟
+        # 这里简单起见，随机选择几个中心点增加资源
+        if hasattr(self, 'resource_clustering') and self.resource_clustering > 0:
+             # 随着 clustering 增加，资源越集中在少数点
+             num_hotspots = max(1, int(10 * (1.0 - self.resource_clustering))) 
+             for _ in range(num_hotspots):
+                 hx, hy = np.random.randint(0, self.grid_size), np.random.randint(0, self.grid_size)
+                 # 热点半径
+                 radius = max(2, int(self.grid_size * 0.1))
+                 # 增加资源
+                 x_grid, y_grid = np.ogrid[-hx:self.grid_size-hx, -hy:self.grid_size-hy]
+                 mask = x_grid*x_grid + y_grid*y_grid <= radius*radius
+                 base_field[mask] += 2.0 * self.resource_clustering # 聚集度越高，加成越多
+        
+        self.resource_field = base_field
         
     def get_delta_e(self) -> float:
         """获取环境扰动幅度 ΔE = |E_t - E_{t-1}|"""
@@ -109,7 +137,12 @@ class SiyanSimulator:
                  r_mean: float = 1.0,
                  r_noise: float = 0.2,
                  env_sigma: float = 0.05,
-                 strategy: str = 'serial'):
+                 strategy: str = 'serial',
+                 # 新增高级参数
+                 resource_clustering: float = 0.0, # 资源聚集度 (0.0=均匀, 1.0=高度聚集)
+                 crowding_cost: float = 0.0,       # 内卷系数 (拥挤成本)
+                 mutation_volatility: float = 0.0  # 突变剧烈度 (发生大跃迁的概率)
+                 ):
         
         self.grid_size = grid_size
         self.initial_density = initial_density
@@ -130,9 +163,12 @@ class SiyanSimulator:
         self.r_noise = r_noise
         self.env_sigma = env_sigma
         self.strategy = strategy
+        self.resource_clustering = resource_clustering
+        self.crowding_cost = crowding_cost
+        self.mutation_volatility = mutation_volatility
         
         # 初始化环境和个体
-        self.environment = Environment(grid_size, r_mean, r_noise, env_sigma)
+        self.environment = Environment(grid_size, r_mean, r_noise, env_sigma, resource_clustering)
         self.grid = [[None for _ in range(grid_size)] for _ in range(grid_size)]
         self.individuals = []
         self.step_count = 0
@@ -206,8 +242,17 @@ class SiyanSimulator:
             resource_gain = individual.get_resource_gain(1.0, self.alpha, local_resource)
             individual.energy += resource_gain
             
-            # 2. 维护消耗
-            maintenance_cost = individual.get_maintenance_cost(self.base_cost, self.gamma)
+            # 2. 维护消耗 (引入内卷成本)
+            # 基础消耗
+            base_maintenance = individual.get_maintenance_cost(self.base_cost, self.gamma)
+            
+            # 内卷消耗: 如果周围人多，消耗增加
+            neighbors_count = len(self.get_neighbors(x, y)) - len(self.get_empty_neighbors(x, y))
+            crowding_penalty = 0.0
+            if hasattr(self, 'crowding_cost') and self.crowding_cost > 0:
+                 crowding_penalty = self.crowding_cost * neighbors_count * (individual.complexity ** 0.5) # 越复杂越怕挤
+            
+            maintenance_cost = base_maintenance + crowding_penalty
             individual.energy -= maintenance_cost
             
             # 3. 可靠性生存判定
@@ -242,10 +287,24 @@ class SiyanSimulator:
                     
                     # 复杂度变异
                     new_complexity = individual.complexity
-                    if random.random() < self.p_up:
-                        new_complexity += 1
-                    elif random.random() < self.p_down:
-                        new_complexity = max(1, new_complexity - 1)
+                    
+                    # 1. 剧烈突变 (Evolutionary Leap)
+                    if hasattr(self, 'mutation_volatility') and self.mutation_volatility > 0:
+                        if random.random() < self.mutation_volatility:
+                            # 发生大跃迁：可能瞬间增加 2-5 点复杂度，或者退化
+                            leap = random.randint(2, 5)
+                            if random.random() < 0.5:
+                                new_complexity += leap
+                            else:
+                                new_complexity = max(1, new_complexity - leap)
+                    
+                    # 2. 常规突变 (Gradual Evolution)
+                    # 如果已经发生了剧烈突变，就不再进行常规突变（或者叠加，这里选择不叠加以区分效应）
+                    if new_complexity == individual.complexity:
+                        if random.random() < self.p_up:
+                            new_complexity += 1
+                        elif random.random() < self.p_down:
+                            new_complexity = max(1, new_complexity - 1)
                     
                     # 创建新个体
                     new_individual = Individual(nx, ny, new_complexity, self.initial_energy, self.strategy)
